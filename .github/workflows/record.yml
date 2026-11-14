@@ -1,0 +1,33 @@
+name: Record Hyperliquid positions
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # every 15 minutes (GitHub may run it a few minutes late)
+  workflow_dispatch: {}      # lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: recorder
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Record positions
+        run: node recorder.mjs
+      - name: Save to repository
+        run: |
+          git config user.name "hl-recorder"
+          git config user.email "hl-recorder@users.noreply.github.com"
+          git add data
+          git diff --cached --quiet || git commit -m "positions $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase --quiet || true
+          git push
