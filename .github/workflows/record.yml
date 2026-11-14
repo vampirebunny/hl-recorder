@@ -15,13 +15,13 @@ concurrency:
 jobs:
   record:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - name: Record positions
+          node-version: 22
+      - name: Record positions and big trades
         run: node recorder.mjs
       - name: Save to repository
         run: |
